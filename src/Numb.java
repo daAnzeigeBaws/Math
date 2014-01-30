@@ -2,6 +2,9 @@ import java.io.*;
 
 abstract class Numb implements FormulaPart
 {
+  private enum Setting {DECIMAL, BINARY};
+  
+  private Setting setting;
   protected boolean isInt = false;
   protected boolean isO = false;
   protected boolean isMin = false;
@@ -12,11 +15,11 @@ abstract class Numb implements FormulaPart
   
   public static void main(String[] s) throws Exception
   {
-    System.out.println("\n\n\nThis is a simple calculator\n'exit' closes this program\n\n");
+    System.out.println("\n\n\nthis is a simple calculator\n'exit' closes this program\n'help' prints a list of the syntax\n\n");
     
     while(true)
     {
-      System.out.println("\nPlease inseret a term:\n");
+      System.out.print("\nsmc>");
       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
       String str = br.readLine();
       
@@ -24,7 +27,46 @@ abstract class Numb implements FormulaPart
       {
         System.exit(0);
       }
-      System.out.println(str);
+      else if(str.compareToIgnoreCase("help") == 0)
+      {
+        printSyntax();
+      }
+      else if(str.toUpperCase().contains("/HELP"))
+      {
+        printSyntax(str);
+      }
+      System.out.println("\nsmc>"+str);
+    }
+  }
+  private static void printSyntax()
+  {
+    System.out.println("\n\nif you want more specific information just type command/help\n\n");
+    System.out.println("SET\t\t\tsets the current representation of the numbers");
+    System.out.println("+\t\t\tadds two numbers");
+    System.out.println("-\t\t\tsubtracts the second number from the first");
+    System.out.println("*\t\t\tmultiplys both numbers");
+    System.out.println("/\t\t\tdevides the first number by the second");
+  }
+  private static void printSyntax(String s)
+  {
+    String str = s.split("/")[0];
+    str = str.toLowerCase();
+    switch(str)
+    {
+      case "set":
+      {
+        System.out.println("\nsets the current representation of the numbers");
+        System.out.println("syntax:\t\t\t\tset/<argument>");
+        System.out.println("possible arguments:\t\tdecimal,binary");
+        break;
+      }
+      case "+":
+      {
+        System.out.println("\nadds two numbers");
+        System.out.println("syntax:\t\t\t\t<argument>+<argument>");
+        System.out.println("possible arguments:\t\tevery valid number, depending\n\t\t\t\ton the current representation");
+        break;
+      }
     }
   }
   
@@ -401,23 +443,5 @@ abstract class Numb implements FormulaPart
       
       return decimalNotationHelp(div(n,TEN), i+st);
     }
-    
-    /*String s = "";
-    Numb na = ONE;
-    do
-    {
-    Numb po = pov(TEN,new Nat(na));
-    Numb nu = sub(n,(mult(po,div(n,po))));
-    
-    int i = 0;
-    while(!nu.isO)
-    {
-    i++;
-    nu = ((Nat)nu).pre;
-    }
-    s = i + s;
-    na = new Nat(na);
-    }
-    while(areEqual(n,pov(TEN,na)) || isBiggerThan(n,pov(TEN,na)));*/
   }
 }
