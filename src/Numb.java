@@ -15,6 +15,7 @@ abstract class Numb implements FormulaPart
   
   public static void main(String[] s) throws Exception
   {
+    System.out.println(binaryNotation(add(ONE,mult(TEN,TEN))));
     System.out.println("\n\n\nthis is a simple calculator\n'exit' closes this program\n'help' prints a list of the syntax\n\n");
     
     while(true)
@@ -67,7 +68,18 @@ abstract class Numb implements FormulaPart
         System.out.println("possible arguments:\t\tevery valid number, depending\n\t\t\t\ton the current representation");
         break;
       }
+      case "-":
+      {
+        System.out.println("\nsubtracts the second number from the first");
+        System.out.println("syntax:\t\t\t\t<argument>-<argument>");
+        System.out.println("possible arguments:\t\tevery valid number, depending\n\t\t\t\ton the current representation");
+        break;
+      }
     }
+  }
+  private static String analyseSyntax(String s)
+  {
+    return s;
   }
   
   public static Numb add(Numb n1, Numb n2)
@@ -295,6 +307,32 @@ abstract class Numb implements FormulaPart
     }
   }
   
+  public static Numb modulo(Numb n1, Numb n2) throws FatalMathException
+  {
+    if(n1.isMin)
+    {
+      return ZERO;
+    }
+    if(n2.isMin)
+    {
+      return ZERO;
+    }
+    if(n2.isO)
+    {
+      throw new FatalMathException();
+    }
+    if(n1.isO)
+    {
+      return ZERO;
+    }
+    if(areEqual(n1,n2))
+    {
+      return ZERO;
+    }
+    
+    return sub(n1,mult(div(n1,n2),n2));
+  }
+  
   public static boolean areEqual(Numb n1, Numb n2)
   {
     if(n1.isO)
@@ -443,5 +481,30 @@ abstract class Numb implements FormulaPart
       
       return decimalNotationHelp(div(n,TEN), i+st);
     }
+  }
+  
+  public static String binaryNotation(Numb n) throws Exception
+  {
+    if(n.isO)
+    {
+      return "0";
+    }
+    else if(n.isMin)
+    {
+      return "";
+    }
+    return binaryNotationHelp(n,"");
+  }
+  private static String binaryNotationHelp(Numb n, String s) throws Exception
+  {
+    if(n.isO)
+    {
+      return s;
+    }
+    if(areEqual(modulo(n,new Nat(ONE)),ZERO))
+    {
+      return binaryNotationHelp(div(n,new Nat(ONE)),"0"+s);
+    }
+    return binaryNotationHelp(div(n,new Nat(ONE)),"1"+s);
   }
 }
