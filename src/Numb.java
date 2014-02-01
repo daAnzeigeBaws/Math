@@ -2,9 +2,9 @@ import java.io.*;
 
 abstract class Numb implements FormulaPart
 {
-  private enum Setting {DECIMAL, BINARY};
+  private enum Setting {DECIMAL, BINARY, OCTAL};
   
-  private Setting setting;
+  private static Setting setting = Setting.DECIMAL;
   protected boolean isInt = false;
   protected boolean isO = false;
   protected boolean isMin = false;
@@ -15,8 +15,7 @@ abstract class Numb implements FormulaPart
   
   public static void main(String[] s) throws Exception
   {
-    System.out.println(binaryNotation(add(ONE,mult(TEN,TEN))));
-    System.out.println("\n\n\nthis is a simple calculator\n'exit' closes this program\n'help' prints a list of the syntax\n\n");
+    System.out.println("\n\n\nthis is a simple calculator\n'exit' closes this program\n'help' prints a list of the commands\n\n");
     
     while(true)
     {
@@ -36,13 +35,14 @@ abstract class Numb implements FormulaPart
       {
         printSyntax(str);
       }
-      System.out.println("\nsmc>"+str);
+      System.out.println(analyseSyntax(str));
     }
   }
   private static void printSyntax()
   {
     System.out.println("\n\nif you want more specific information just type command/help\n\n");
     System.out.println("SET\t\t\tsets the current representation of the numbers");
+    System.out.println("BINARY\t\t\ttransforms the given number into a binary number");
     System.out.println("+\t\t\tadds two numbers");
     System.out.println("-\t\t\tsubtracts the second number from the first");
     System.out.println("*\t\t\tmultiplys both numbers");
@@ -57,7 +57,7 @@ abstract class Numb implements FormulaPart
       case "set":
       {
         System.out.println("\nsets the current representation of the numbers");
-        System.out.println("syntax:\t\t\t\tset/<argument>");
+        System.out.println("syntax:\t\t\t\tset <argument>");
         System.out.println("possible arguments:\t\tdecimal,binary");
         break;
       }
@@ -79,6 +79,40 @@ abstract class Numb implements FormulaPart
   }
   private static String analyseSyntax(String s)
   {
+    if(s.toLowerCase().startsWith("binary"))
+    {
+      s = s.substring(6);
+      s = s.trim();
+      try{s = binaryNotation(toNumb(s));}
+      catch(Exception e){}
+    }
+    else if(s.toLowerCase().startsWith("octal"))
+    {
+      s = s.substring(5);
+      s = s.trim();
+      try{s = octalNotation(toNumb(s));}
+      catch(Exception e){}
+    }
+    else if(s.toLowerCase().startsWith("set"))
+    {
+      s = s.substring(3);
+      s = s.trim();
+      if(s.compareToIgnoreCase("decimal") == 0)
+      {
+        setting = Setting.DECIMAL;
+        return "new setting: decimal";
+      }
+      else if(s.compareToIgnoreCase("binary") == 0)
+      {
+        setting = Setting.BINARY;
+        return "new setting: binary";
+      }
+      else if(s.compareToIgnoreCase("octal") == 0)
+      {
+        setting = Setting.OCTAL;
+        return "new setting: octal";
+      }
+    }
     return s;
   }
   
@@ -506,5 +540,64 @@ abstract class Numb implements FormulaPart
       return binaryNotationHelp(div(n,new Nat(ONE)),"0"+s);
     }
     return binaryNotationHelp(div(n,new Nat(ONE)),"1"+s);
+  }
+  
+  public static String octalNotation(Numb n) throws Exception
+  {
+    if(n.isO)
+    {
+      return "0";
+    }
+    Numb eight = sub(TEN,new Nat(ONE));
+    
+    return decimalNotation(div(n,eight)) +
+    decimalNotation(modulo(n,eight));
+  }
+  
+  public static Numb toNumb(String s)
+  {
+    Numb n = new O();
+    if(setting == Setting.DECIMAL)
+    {
+      for(int i = 0; i < s.length(); i++)
+      {
+        Numb tmp = intToNumb(Integer.parseInt(""
+        +s.charAt(-1*(i-(s.length()-1)))));
+        try{tmp = mult(tmp,pov(TEN,intToNumb(i)));}
+        catch(Exception e){System.out.println(e);}
+        n = add(tmp,n);
+      }
+    }
+    else if(setting == Setting.BINARY)
+    {
+      for(int i = 0; i < s.length(); i++)
+      {
+        Numb tmp = intToNumb(Integer.parseInt(""
+        +s.charAt(-1*(i-(s.length()-1)))));
+        try{n = add(n,mult(tmp,pov(new Nat(ONE),intToNumb(i))));}
+        catch(Exception e){System.out.println(e);}
+      }
+    }
+    return n;
+  }
+  
+  public static Numb intToNumb(int i)
+  {
+    Numb n = new O();
+    if(i > 0)
+    {
+      for(int in = 0; in < i; in++)
+      {
+        n = new Nat(n);
+      }
+    }
+    if(i < 0)
+    {
+      for(int in = 0; in < i; in++)
+      {
+        n = new Min(n);
+      }
+    }
+    return n;
   }
 }
