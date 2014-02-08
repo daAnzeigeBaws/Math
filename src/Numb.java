@@ -169,13 +169,24 @@ abstract class Numb implements FormulaPart
         }
         return n;
       }
+      else if(s.contains("%"))
+      {
+        Numb n = toNumb(s.split("\\%")[0]);
+        for(int i = 1; i < s.split("\\%").length; i++)
+        {
+          n = modulo(n,calculate(s.split("\\%")[i]));
+        }
+        return n;
+      }
       else
       {
         return toNumb(s);
       }
     }
     catch(Exception e)
-    {e.printStackTrace();}
+    {
+      e.printStackTrace();
+    }
     return ZERO;
   }
   
