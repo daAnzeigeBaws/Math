@@ -171,6 +171,7 @@ abstract class Numb implements FormulaPart
       }
       else
       {
+        System.out.println("toNumb: "+s);
         return toNumb(s);
       }
     }
