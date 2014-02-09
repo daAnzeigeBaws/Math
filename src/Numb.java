@@ -13,6 +13,8 @@ abstract class Numb implements FormulaPart
   public static final Numb ONE = new Nat();
   public static final Numb TEN = new Nat(new Nat(new Nat(new Nat(new Nat(new Nat(new Nat(new Nat(new Nat(ONE)))))))));
   
+  private static Numb lastResult = ZERO;
+  
   public static void main(String[] s) throws Exception
   {
     doStuff();
@@ -124,7 +126,20 @@ abstract class Numb implements FormulaPart
     else
     {
       if(setting == Setting.DECIMAL)
-      return decimalNotation(calculate(s.toLowerCase()));
+      {
+        lastResult = calculate(s.toLowerCase());
+        return decimalNotation(lastResult);
+      }
+      else if(setting == Setting.OCTAL)
+      {
+        lastResult = calculate(s.toLowerCase());
+        return octalNotation(lastResult);
+      }
+      else if(setting == Setting.BINARY)
+      {
+        lastResult = calculate(s.toLowerCase());
+        return binaryNotation(lastResult);
+      }
     }
     return s;
   }
@@ -133,7 +148,11 @@ abstract class Numb implements FormulaPart
     s = s.trim();
     try
     {
-      if(s.contains("+"))
+      if(s.equals("ans"))
+      {
+        return lastResult;
+      }
+      else if(s.contains("+"))
       {
         Numb n = ZERO;
         for(int i = 0; i < s.split("\\+").length; i++)
@@ -162,7 +181,7 @@ abstract class Numb implements FormulaPart
       }
       else if(s.contains("/"))
       {
-        Numb n = toNumb(s.split("\\/")[0]);
+        Numb n = calculate(s.split("\\/")[0]);
         for(int i = 1; i < s.split("\\/").length; i++)
         {
           n = div(n,calculate(s.split("\\/")[i]));
@@ -171,10 +190,19 @@ abstract class Numb implements FormulaPart
       }
       else if(s.contains("%"))
       {
-        Numb n = toNumb(s.split("\\%")[0]);
+        Numb n = calculate(s.split("\\%")[0]);
         for(int i = 1; i < s.split("\\%").length; i++)
         {
           n = modulo(n,calculate(s.split("\\%")[i]));
+        }
+        return n;
+      }
+      else if(s.contains("^"))
+      {
+        Numb n = calculate(s.split("\\^")[0]);
+        for(int i = 1; i < s.split("\\^").length; i++)
+        {
+          n = pov(n,calculate(s.split("\\^")[i]));
         }
         return n;
       }
